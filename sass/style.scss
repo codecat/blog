@@ -1,0 +1,140 @@
+$blog-background: #34363f;
+$blog-color: #fff;
+$blog-accent: hsl(85deg, 80%, 60%);
+
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;700&display=swap');
+
+html, body, button, input, select, textarea, .pure-g [class *= "pure-u"] {
+	font-family: 'Source Sans Pro', sans-serif;
+	font-size: 16px;
+}
+
+html, body {
+	height: 100%;
+	margin: 0;
+}
+
+body {
+	font-weight: 300;
+
+	background: $blog-background;
+	color: $blog-color;
+
+	display: flex;
+	flex-direction: column;
+}
+
+header, footer {
+	text-align: center;
+	background: lighten($blog-background, 5%);
+	padding: 2em;
+}
+
+header {
+	box-shadow: 0em 0.3em 1em rgba(#000, 0.1);
+
+	h1 {
+		margin-bottom: 0;
+
+		a {
+			color: $blog-color;
+			&:hover { color: $blog-color; }
+		}
+	}
+
+	.social {
+		font-size: 1.5em;
+		margin: 0;
+	}
+}
+
+footer {
+	margin-top: auto;
+	box-shadow: 0em -0.3em 1em rgba(#000, 0.1);
+}
+
+.container {
+	padding: 2em;
+	align-self: center;
+	max-width: 900px;
+	width: 100%;
+	box-sizing: border-box;
+}
+
+a {
+	color: $blog-accent;
+	text-decoration: none;
+
+	&:hover { color: lighten($blog-accent, 25%); }
+}
+
+article {
+	h1, h2 {
+		margin-bottom: 0.1em;
+	}
+
+	&.index {
+		margin-bottom: 2em;
+		background: lighten($blog-background, 3%);
+		padding: 0em 1.5em;
+		box-shadow: 0.1em 0.2em 1em rgba(#000, 0.1);
+	}
+
+	p.subtitle {
+		opacity: 0.8;
+		margin-top: 0;
+		padding-bottom: 0.2em;
+		border-bottom: 1px dashed lighten($blog-background, 10%);
+	}
+
+	img {
+		max-width: 100%;
+	}
+
+	.content {
+		pre {
+			font-size: 0.8em;
+			padding: 1em;
+			tab-size: 2;
+			-moz-tab-size: 2;
+		}
+
+		code {
+			font-size: 0.8em;
+			background: #212121;
+			padding: 0.3em 0.4em;
+		}
+
+		h1, h2, h3, h4, h5, h6 {
+			margin-top: 1rem;
+			margin-bottom: 0;
+		}
+
+		h1 {
+			font-size: 1.8em;
+		}
+		h2 {
+			font-size: 1.8em;
+			color: $blog-accent;
+		}
+		h3 {
+			font-size: 1.4em;
+		}
+		h4 {
+			font-size: 1.4em;
+			color: $blog-accent;
+		}
+		h5 {
+			font-size: 1.0em;
+		}
+		h6 {
+			font-size: 1.0em;
+			color: $blog-accent;
+		}
+
+		hr {
+			border: 0;
+			border-top: 1px dashed lighten($blog-background, 10%);
+		}
+	}
+}
