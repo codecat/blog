@@ -4,7 +4,7 @@
 	{% for post in section.pages %}
 		<article class="index pure-g">
 			<div class="pure-u-1">
-				<h2><a href="/{{ post.path }}">{{ post.title }}</a></h2>
+				<h2><a href="{{ post.path }}">{{ post.title }}</a></h2>
 				<p class="subtitle">
 					<i class="fa fa-calendar" aria-hidden="true"></i>
 					Posted on {{ post.date | date }}
