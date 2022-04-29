@@ -2,10 +2,10 @@ $blog-background: #34363f;
 $blog-color: #fff;
 $blog-accent: hsl(85deg, 80%, 60%);
 
-@import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@100&display=swap');
 
 html, body, button, input, select, textarea, .pure-g [class *= "pure-u"] {
-	font-family: 'Source Sans Pro', sans-serif;
+	font-family: 'Open Sans', sans-serif;
 	font-size: 16px;
 }
 
@@ -15,7 +15,7 @@ html, body {
 }
 
 body {
-	font-weight: 300;
+	font-weight: 100;
 
 	background: $blog-background;
 	color: $blog-color;
@@ -70,7 +70,7 @@ a {
 
 article {
 	h1, h2 {
-		margin-bottom: 0.1em;
+		margin-bottom: 0.2em;
 	}
 
 	&.index {
