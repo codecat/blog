@@ -1,4 +1,4 @@
-base_url = "codecat.nl"
+base_url = "https://codecat.nl"
 compile_sass = true
 
 [markdown]
