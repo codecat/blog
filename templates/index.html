@@ -11,7 +11,7 @@
 				</p>
 				{% if post.summary %}
 					<p>{{ post.summary | safe }}</p>
-					<p class="readmore"><a href="/{{ post.path }}">Read more...</a></p>
+					<p class="readmore"><a href="{{ post.path }}">Read more...</a></p>
 				{% endif %}
 			</div>
 		</article>
