@@ -10,7 +10,7 @@
 					Posted on {{ post.date | date }}
 				</p>
 				{% if post.summary %}
-					<p>{{ post.summary | safe }}</p>
+					{{ post.summary | safe }}
 					<p class="readmore"><a href="{{ post.path }}">Read more...</a></p>
 				{% endif %}
 			</div>
