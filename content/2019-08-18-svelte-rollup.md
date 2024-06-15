@@ -10,6 +10,10 @@ As I'm not well-versed in the world of modern web technologies, I figured I'd wr
 
 <!-- more -->
 
+**NOTE**: I am no longer using Svelte nor Rollup frequently. There are now much better tools that work much easier out-of-the-box, like [Vite](https://vitejs.dev/guide/).
+
+---
+
 I got started by going through the [Svelte tutorial](https://svelte.dev/tutorial/basics). I learned how components work and how to do the basic templating stuff. Great! But then I hit the most demotivating part of the tutorial; setting up a build tool.
 
 The tutorial helpfully links to a “step-by-step guide” to setting this up specifically aimed for “new developers”, however at the time of writing, the link points to an empty “Coming Soon” page. Very useful. Okay, guess I have to figure it out myself.
