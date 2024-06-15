@@ -2,6 +2,9 @@
 title = "What I learned from The Serious Ranker"
 date = 2015-10-25
 path = "2015/10/what-i-learned-from-the-serious-ranker"
+
+[extra]
+og_description = "Designing a third-party leaderboard for an FPS game, and its progression towards its end-of-life."
 +++
 
 This is a post I've wanted to do for a while. It's about a leaderboard design and its progression towards its end-of-life. I'm posting this in the hope that it will be useful to people, you could learn something from this!

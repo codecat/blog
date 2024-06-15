@@ -2,13 +2,17 @@
 title = "Reverse engineering and 'exploiting' a game trainer"
 date = 2018-05-20
 path = "2018/05/reverse-engineering-and-exploiting-a-game-trainer"
+
+[extra]
+og_image = "/2018/05/hwr.jpg"
+og_description = "Our game had a game trainer that we did not like having around - so I reverse engineered it."
 +++
 
 In the weeks after [Heroes of Hammerwatch](https://store.steampowered.com/app/677120/Heroes_of_Hammerwatch/) came out, people kept asking for cheats for the game. You would expect in any other single player game there would be one or two cheats available that players can use, but in Heroes of Hammerwatch we've decided to keep the cheats locked up only for developers. There's a few reasons for that, but the main reason is that the player's stats are persistent; players can bring their own character into multiplayer sessions.
 
-<!-- more -->
-
 ![](/2018/05/hwr.jpg)
+
+<!-- more -->
 
 So, to avoid cheat abuse, there are no official cheats in the game. Further, to avoid people using basic Cheat Engine skills, we've made a few precautions to make it a bit harder to scan and change variables with programs like Cheat Engine.
 

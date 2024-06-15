@@ -2,6 +2,9 @@
 title = "Creating a web-app with Svelte and Rollup as a game developer"
 date = 2019-08-18
 path = "2019/08/creating-a-web-app-with-svelte-and-rollup-as-a-game-developer"
+
+[extra]
+og_description = "I'm not a web developer. I'm a game developer who primarily uses C++. But I needed to set up a nice easy-to-work-with web-app for a project, so I was forced to kinda learn how to do that."
 +++
 
 I'm not a web developer. I'm a game developer who primarily uses C++. But I needed to set up a nice easy-to-work-with web-app for a project, so I was forced to kinda learn how to do that.

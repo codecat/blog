@@ -4,7 +4,22 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width">
 
-		<title>Codecat | Scribblings of a programatrickerist.</title>
+		{% if page and page.title %}
+			<title>{{ page.title }} - Codecat - Scribblings of a programatrickerist.</title>
+		{% else %}
+			<title>Codecat - Scribblings of a programatrickerist.</title>
+		{% endif %}
+
+		<meta name="theme-color" content="#a7eb47">
+		<meta property="og:title" content="{% if page.title %}{{ page.title }}{% else %}Codecat's Blog{% endif %}">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="{% if page.permalink %}{{ page.permalink | safe }}{% else %}{{ config.base_url | safe }}{% endif %}">
+		{% if page.extra.og_image %}
+			<meta property="og:image" content="{{ config.base_url | safe }}{{ page.extra.og_image | safe }}">
+		{% endif %}
+		{% if page.extra.og_description %}
+			<meta property="og:description" content="{{ page.extra.og_description }}">
+		{% endif %}
 
 		<link rel="stylesheet" href="/pure.css">
 		<link rel="stylesheet" href="/style.css">

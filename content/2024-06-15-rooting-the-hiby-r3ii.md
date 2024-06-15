@@ -2,6 +2,10 @@
 title = "Rooting the HiBy R3ii"
 date = 2024-06-15
 path = "2024/06/hiby-r3ii-root"
+
+[extra]
+og_image = "/2024/06/hiby-main.jpg"
+og_description = "The HiBy R3ii is a \"Digital Audio Player\" (DAP), basically the modern equivalent of MP3 players from the 00's. Naturally, I wanted to find out how hackable the device is."
 +++
 
 The HiBy R3ii is a "Digital Audio Player" (DAP), basically the modern equivalent of MP3 players from the 00's. Naturally, I wanted to find out how hackable the device is.

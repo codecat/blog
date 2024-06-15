@@ -2,6 +2,9 @@
 title = "Implementing a stylesheet system is hard"
 date = 2017-08-02
 path = "2017/08/nimble-app-progress"
+
+[extra]
+og_description = "It's difficult to implement a stylesheet system; a small progress report on my experimental application framework."
 +++
 
 It has been exactly 1 month since [my last blogpost on Nimble Application Framework](/hardware-accelerated-application-framework). In the past month I've been working on and off, particularly on stylesheet experimentation; which I have decided to cut for the time being.

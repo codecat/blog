@@ -2,6 +2,9 @@
 title = "Hardware accelerated application framework in C++"
 date = 2017-07-02
 path = "2017/07/hardware-accelerated-application-framework"
+
+[extra]
+og_description = "I have decided to start working on a new hardware accelerated (cross-platform) application framework in C++, called Nimble Application Framework."
 +++
 
 I have decided to start working on a new hardware accelerated (cross-platform) application framework in C++, called Nimble Application Framework.

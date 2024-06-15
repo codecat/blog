@@ -2,6 +2,10 @@
 title = "Building an open source IRL livestreaming backpack"
 date = 2022-08-18
 path = "2022/08/irl-backpack"
+
+[extra]
+og_image = "/2022/08/backpack.jpg"
+og_description = "This month I decided to build an IRL livestreaming backpack. Not with the desire to become an IRL streamer, but because I think it's a very fun technical challenge. I gathered and set up all the hardware, reverse engineered some firmware images, and coded my own software to control it."
 +++
 
 This month I decided to build an IRL livestreaming backpack. Not with the desire to become an IRL streamer, but because I think it's a very fun technical challenge. I gathered and set up all the hardware, reverse engineered some firmware images, and coded my own software to control it.
