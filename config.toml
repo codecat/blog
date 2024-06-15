@@ -1,5 +1,6 @@
 base_url = "https://codecat.nl"
 compile_sass = true
+generate_feed = true
 
 [markdown]
 highlight_code = true
