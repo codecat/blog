@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en-US">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width">
+
+		
+			<title>Creating a web-app with Svelte and Rollup as a game developer - Codecat - Scribblings of a programatrickerist.</title>
+		
+
+		<meta name="theme-color" content="#a7eb47">
+		<meta property="og:title" content="Creating a web-app with Svelte and Rollup as a game developer">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://codecat.nl/2019/08/creating-a-web-app-with-svelte-and-rollup-as-a-game-developer/">
+		
+		
+			<meta property="og:description" content="I&#x27;m not a web developer. I&#x27;m a game developer who primarily uses C++. But I needed to set up a nice easy-to-work-with web-app for a project, so I was forced to kinda learn how to do that.">
+		
+
+		<link rel="stylesheet" href="/pure.css">
+		<link rel="stylesheet" href="/style.css">
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css" integrity="sha256-XoaMnoYC5TH6/+ihMEnospgm0J1PM/nioxbOUdnM8HY=" crossorigin="anonymous">
+	</head>
+
+	<body>
+		<header>
+			<h1><a href="/">Codecat.nl</a></h1>
+			<p class="social">
+				<a rel="me noopener noreferrer" href="https://meow.social/@codecat" title="Mastodon" target="_blank"><i class="fa fa-mastodon" aria-hidden="true"></i></a>
+				<a rel="me noopener noreferrer" href="https://github.com/codecat" title="GitHub" target="_blank"><i class="fa fa-github" aria-hidden="true"></i></a>
+				<a rel="me noopener noreferrer" href="https://nimble.itch.io" title="Itch" target="_blank"><i class="fa fa-gamepad" aria-hidden="true"></i></a>
+				<a rel="me noopener noreferrer" href="https://twitch.tv/missterious" title="Twitch" target="_blank"><i class="fa fa-twitch" aria-hidden="true"></i></a>
+				<a rel="me noopener noreferrer" href="https://soundcloud.com/codecatt" title="SoundCloud" target="_blank"><i class="fa fa-soundcloud" aria-hidden="true"></i></a>
+			</p>
+		</header>
+
+		<div class="container">
+			
+	<article class="pure-g">
+		<div class="pure-u-1">
+			<h1>Creating a web-app with Svelte and Rollup as a game developer</h1>
+			<p class="subtitle">
+				<i class="fa fa-calendar" aria-hidden="true"></i>
+				Posted on 2019-08-18
+			</p>
+			<div class="content">
+				<p>I'm not a web developer. I'm a game developer who primarily uses C++. But I needed to set up a nice easy-to-work-with web-app for a project, so I was forced to kinda learn how to do that.</p>
+<p>As I'm not well-versed in the world of modern web technologies, I figured I'd write a blog post of my experience of setting up a simple Svelte site, for people who might be in the same boat as me.</p>
+<span id="continue-reading"></span>
+<p><strong>NOTE</strong>: I am no longer using Svelte nor Rollup frequently. There are now much better tools that work much easier out-of-the-box, like <a href="https://vitejs.dev/guide/">Vite</a>.</p>
+<hr />
+<p>I got started by going through the <a href="https://svelte.dev/tutorial/basics">Svelte tutorial</a>. I learned how components work and how to do the basic templating stuff. Great! But then I hit the most demotivating part of the tutorial; setting up a build tool.</p>
+<p>The tutorial helpfully links to a “step-by-step guide” to setting this up specifically aimed for “new developers”, however at the time of writing, the link points to an empty “Coming Soon” page. Very useful. Okay, guess I have to figure it out myself.</p>
+<p>In this post I will only go into setting up the build tool for Svelte, if you need to learn more about how Svelte itself works, the tutorial is an excellent source of information.</p>
+<p>Unfortunately, the good ol' days of web development where you only needed to reference a single .js or a .css file are over. To use a lot of the modern web technology now, you will need to compile your code with some kind of build tool.</p>
+<p>If you're used to C++ build tools such as CMake/Premake/GENie/etc, then <a href="https://rollupjs.org/">rollup</a> should be somewhat familiar. You create a configuration file, and run a command line tool to build your project.</p>
+<p>First of all, the majority of the build tools you're going to find in the web tech space is going to be a <a href="https://nodejs.org/en/">Node.js</a> package. This means that all these build tools run on Javascript themselves. So we install Node.js and continue. Node.js comes with a package manager called “npm”, which we will use to download and install the tools and libraries necessary.</p>
+<p>Start by creating a new folder for your project. Then, on the command line, run the following:</p>
+<pre data-lang="bash" style="background-color:#212121;color:#eeffff;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#82aaff;">npm install</span><span style="color:#89ddff;"> -</span><span style="color:#f78c6c;">g</span><span style="color:#82aaff;"> rollup
+</span></code></pre>
+<p>This will install the rollup build tool for us, which we will use to build the code to a single .js file. By the way, while C++ build tools produce “binaries”, we call these build products “bundles”, as it is bundling all of our source code together into 1 big javascript source file that we include in our html file.</p>
+<p>Note that we passed the <code>-g</code> flag to npm while installing rollup. This means that it will install it globally, rather than locally in the project. This is an important detail, as we don't want the entire rollup binary inside of our project folder.</p>
+<p>What we do want in our project folder however, is the libraries we'll be using. In our case, Svelte. We will also need to install a “plugin” for rollup that will compile the .svelte files for us. So we run npm again:</p>
+<pre data-lang="bash" style="background-color:#212121;color:#eeffff;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#82aaff;">npm install</span><span style="color:#89ddff;"> --</span><span style="color:#f78c6c;">save-dev</span><span style="color:#82aaff;"> svelte rollup-plugin-svelte rollup-plugin-node-resolve
+</span></code></pre>
+<p>Note that we are installing these packges not with <code>-g</code>, but with <code>--save-dev</code>. This means we will install them locally (by omitting the global flag) and saving the dependencies in the <code>devDependencies</code> list in <code>package.json</code>. Normal dependencies are dependencies that should be available in production, and development dependencies are ones that we only need during development. We don't need Svelte as a production dependency, because it'll automatically be included in our bundle when the project compiles.</p>
+<p>Also note that we installed 2 rollup plugins: <code>rollup-plugin-svelte</code>, and <code>rollup-plugin-node-resolve</code>. The first one provides the Svelte compiler, and the second one is a helper plugin that tells rollup where Svelte is located so that it can be properly included in the bundle.</p>
+<p>Before we begin writing our rollup configuration file, we create some folders that we'll be using for the source. Start by creating a <code>public</code> folder in your project folder. This will be the output directory, and where we will write our entry-point <code>index.html</code>. Next, create a <code>src</code> folder in your project folder, and inside of that, create a <code>components</code> folder. We will be putting Svelte components in there.</p>
+<p>We create a simple <code>src/main.js</code> file, which will load a component into our HTML's body:</p>
+<pre data-lang="js" style="background-color:#212121;color:#eeffff;" class="language-js "><code class="language-js" data-lang="js"><span style="font-style:italic;color:#c792ea;">import </span><span>Main </span><span style="font-style:italic;color:#c792ea;">from </span><span style="color:#89ddff;">&quot;</span><span style="color:#c3e88d;">./components/Main.svelte</span><span style="color:#89ddff;">&quot;;
+</span><span style="font-style:italic;color:#c792ea;">var </span><span>app </span><span style="color:#89ddff;">= new </span><span>Main(</span><span style="color:#89ddff;">{
+</span><span>	target</span><span style="color:#89ddff;">: </span><span>document</span><span style="color:#89ddff;">.</span><span>body
+</span><span style="color:#89ddff;">}</span><span>)</span><span style="color:#89ddff;">;
+</span></code></pre>
+<p>And a <code>src/components/Main.svelte</code> file:</p>
+<pre data-lang="html" style="background-color:#212121;color:#eeffff;" class="language-html "><code class="language-html" data-lang="html"><span style="color:#89ddff;">&lt;</span><span style="color:#f07178;">h1</span><span style="color:#89ddff;">&gt;</span><span>Hello, world!</span><span style="color:#89ddff;">&lt;/</span><span style="color:#f07178;">h1</span><span style="color:#89ddff;">&gt;
+</span></code></pre>
+<p>Okay, that's all the code done. Now, off to the rollup configuration. In your project's folder, create a file called <code>rollup.config.js</code>. This file will be executed by rollup when invoked from the command like with <code>rollup -c</code>. Let's start by importing our rollup plugins:</p>
+<pre data-lang="js" style="background-color:#212121;color:#eeffff;" class="language-js "><code class="language-js" data-lang="js"><span style="font-style:italic;color:#c792ea;">import </span><span>svelte </span><span style="font-style:italic;color:#c792ea;">from </span><span style="color:#89ddff;">&quot;</span><span style="color:#c3e88d;">rollup-plugin-svelte</span><span style="color:#89ddff;">&quot;;
+</span><span style="font-style:italic;color:#c792ea;">import </span><span>resolve </span><span style="font-style:italic;color:#c792ea;">from </span><span style="color:#89ddff;">&quot;</span><span style="color:#c3e88d;">rollup-plugin-node-resolve</span><span style="color:#89ddff;">&quot;;
+</span></code></pre>
+<p>These lines import the <code>svelte</code> and <code>resolve</code> functions representing the plugin logic. We will need these later in the script.</p>
+<pre data-lang="js" style="background-color:#212121;color:#eeffff;" class="language-js "><code class="language-js" data-lang="js"><span style="font-style:italic;color:#c792ea;">export default
+</span><span style="color:#89ddff;">{
+</span></code></pre>
+<p>Here, we are starting the configuration object for rollup to use. The syntax used here is a little weird, but it technically allows you to have multiple configurations. The <code>export default</code> line above can be replaced with <code>module.exports =</code> and it will work the same.</p>
+<pre data-lang="js" style="background-color:#212121;color:#eeffff;" class="language-js "><code class="language-js" data-lang="js"><span>	input</span><span style="color:#89ddff;">: &quot;</span><span style="color:#c3e88d;">src/main.js</span><span style="color:#89ddff;">&quot;,
+</span></code></pre>
+<p>This specifies the main entry point of your application. Rollup will begin analyzing at this file, and from there figure out which files are imported and required for the application.</p>
+<pre data-lang="js" style="background-color:#212121;color:#eeffff;" class="language-js "><code class="language-js" data-lang="js"><span>	output</span><span style="color:#89ddff;">: {
+</span><span>		file</span><span style="color:#89ddff;">: &quot;</span><span style="color:#c3e88d;">public/bundle.js</span><span style="color:#89ddff;">&quot;,
+</span><span>		format</span><span style="color:#89ddff;">: &quot;</span><span style="color:#c3e88d;">iife</span><span style="color:#89ddff;">&quot;,
+</span><span>		compact</span><span style="color:#89ddff;">: </span><span style="color:#f78c6c;">true
+</span><span>	</span><span style="color:#89ddff;">},
+</span></code></pre>
+<p>Next up is our output configuration. We specify an output filename, <code>public/bundle.js</code>, as the file to compile our bundle to. The format is not super interesting, but basically <code>iife</code> is a format that encapsulates the entire bundle in a self-executing function. This means that any local variables etc. will not leak out to the global scope. Nice! The <code>compact</code> option is optional, but it makes the output bundle file a little bit smaller.</p>
+<p>Now, how do we tell rollup how .svelte files are compiled? This is where the plugins come in.</p>
+<pre data-lang="js" style="background-color:#212121;color:#eeffff;" class="language-js "><code class="language-js" data-lang="js"><span>	plugins</span><span style="color:#89ddff;">: </span><span>[
+</span><span>		</span><span style="color:#82aaff;">svelte</span><span>(</span><span style="color:#89ddff;">{
+</span><span>			include</span><span style="color:#89ddff;">: &quot;</span><span style="color:#c3e88d;">src/components/**/*.svelte</span><span style="color:#89ddff;">&quot;,
+</span><span>			</span><span style="color:#82aaff;">css</span><span style="color:#89ddff;">: </span><span style="font-style:italic;color:#c792ea;">function</span><span style="color:#89ddff;">(</span><span style="color:#f78c6c;">css</span><span style="color:#89ddff;">) {
+</span><span>				css</span><span style="color:#89ddff;">.</span><span style="color:#82aaff;">write</span><span>(</span><span style="color:#89ddff;">&quot;</span><span style="color:#c3e88d;">public/style.css</span><span style="color:#89ddff;">&quot;, </span><span style="color:#f78c6c;">false</span><span>)</span><span style="color:#89ddff;">;
+</span><span>			</span><span style="color:#89ddff;">},
+</span><span>		</span><span style="color:#89ddff;">}</span><span>)</span><span style="color:#89ddff;">,
+</span><span>
+</span><span>		</span><span style="color:#82aaff;">resolve</span><span>(</span><span style="color:#89ddff;">{
+</span><span>			browser</span><span style="color:#89ddff;">: </span><span style="color:#f78c6c;">true
+</span><span>		</span><span style="color:#89ddff;">}</span><span>)
+</span><span>	]
+</span></code></pre>
+<p>Note that we are loading 2 plugins here, <code>svelte</code> and <code>resolve</code> that each have their own configuration as well.</p>
+<p>Svelte's configuration specifies where our components are located (the .svelte files), and a callback for the CSS. I'm not entirely sure why this is a callback function, but that's how it works. We let Svelte write out its CSS file here. (The <code>false</code> as the second parameter means that we don't want it to write a source map file.)</p>
+<p>The other plugin, <code>resolve</code>, simply helps rollup find the dependencies for Svelte inside of the <code>node_modules</code> folder. Without this plugin, it won't be able to include it in the bundle file and it will produce build errors.</p>
+<p>The configuration file should now look something like this:</p>
+<pre data-lang="js" style="background-color:#212121;color:#eeffff;" class="language-js "><code class="language-js" data-lang="js"><span style="font-style:italic;color:#c792ea;">import </span><span>svelte </span><span style="font-style:italic;color:#c792ea;">from </span><span style="color:#89ddff;">&quot;</span><span style="color:#c3e88d;">rollup-plugin-svelte</span><span style="color:#89ddff;">&quot;;
+</span><span style="font-style:italic;color:#c792ea;">import </span><span>resolve </span><span style="font-style:italic;color:#c792ea;">from </span><span style="color:#89ddff;">&quot;</span><span style="color:#c3e88d;">rollup-plugin-node-resolve</span><span style="color:#89ddff;">&quot;;
+</span><span>
+</span><span style="font-style:italic;color:#c792ea;">export default
+</span><span style="color:#89ddff;">{
+</span><span>	input</span><span style="color:#89ddff;">: &quot;</span><span style="color:#c3e88d;">src/main.js</span><span style="color:#89ddff;">&quot;,
+</span><span>	output</span><span style="color:#89ddff;">: {
+</span><span>		file</span><span style="color:#89ddff;">: &quot;</span><span style="color:#c3e88d;">public/bundle.js</span><span style="color:#89ddff;">&quot;,
+</span><span>		format</span><span style="color:#89ddff;">: &quot;</span><span style="color:#c3e88d;">iife</span><span style="color:#89ddff;">&quot;,
+</span><span>		compact</span><span style="color:#89ddff;">: </span><span style="color:#f78c6c;">true
+</span><span>	</span><span style="color:#89ddff;">},
+</span><span>	plugins</span><span style="color:#89ddff;">: </span><span>[
+</span><span>		</span><span style="color:#82aaff;">svelte</span><span>(</span><span style="color:#89ddff;">{
+</span><span>			include</span><span style="color:#89ddff;">: &quot;</span><span style="color:#c3e88d;">src/components/**/*.svelte</span><span style="color:#89ddff;">&quot;,
+</span><span>			</span><span style="color:#82aaff;">css</span><span style="color:#89ddff;">: </span><span style="font-style:italic;color:#c792ea;">function</span><span style="color:#89ddff;">(</span><span style="color:#f78c6c;">css</span><span style="color:#89ddff;">) {
+</span><span>				css</span><span style="color:#89ddff;">.</span><span style="color:#82aaff;">write</span><span>(</span><span style="color:#89ddff;">&quot;</span><span style="color:#c3e88d;">public/style.css</span><span style="color:#89ddff;">&quot;, </span><span style="color:#f78c6c;">false</span><span>)</span><span style="color:#89ddff;">;
+</span><span>			</span><span style="color:#89ddff;">},
+</span><span>		</span><span style="color:#89ddff;">}</span><span>)</span><span style="color:#89ddff;">,
+</span><span>
+</span><span>		</span><span style="color:#82aaff;">resolve</span><span>(</span><span style="color:#89ddff;">{
+</span><span>			browser</span><span style="color:#89ddff;">: </span><span style="color:#f78c6c;">true
+</span><span>		</span><span style="color:#89ddff;">}</span><span>)
+</span><span>	]
+</span><span style="color:#89ddff;">};
+</span></code></pre>
+<p>Now, we can run a rollup build, and everything should be ok!</p>
+<pre style="background-color:#212121;color:#eeffff;"><code><span>$ rollup -c
+</span><span>src/main.js → public/bundle.js...
+</span><span>created public/bundle.js in 138ms
+</span></code></pre>
+<p>Hooray! You can verify that <code>bundle.js</code> contains actual code now. Now we just have to write our <code>public/index.html</code> file:</p>
+<pre data-lang="html" style="background-color:#212121;color:#eeffff;" class="language-html "><code class="language-html" data-lang="html"><span style="color:#89ddff;">&lt;!</span><span style="color:#c792ea;">DOCTYPE </span><span style="color:#f78c6c;">html</span><span style="color:#89ddff;">&gt;
+</span><span style="color:#89ddff;">&lt;</span><span style="color:#f07178;">html</span><span style="color:#89ddff;">&gt;
+</span><span>	</span><span style="color:#89ddff;">&lt;</span><span style="color:#f07178;">head</span><span style="color:#89ddff;">&gt;
+</span><span>		</span><span style="color:#89ddff;">&lt;</span><span style="color:#f07178;">title</span><span style="color:#89ddff;">&gt;</span><span>Svelte Test</span><span style="color:#89ddff;">&lt;/</span><span style="color:#f07178;">title</span><span style="color:#89ddff;">&gt;
+</span><span>		</span><span style="color:#89ddff;">&lt;</span><span style="color:#f07178;">meta </span><span style="font-style:italic;color:#ffcb6b;">charset</span><span style="color:#89ddff;">=&quot;</span><span style="color:#c3e88d;">utf-8</span><span style="color:#89ddff;">&quot;&gt;
+</span><span>		</span><span style="color:#89ddff;">&lt;</span><span style="color:#f07178;">link </span><span style="font-style:italic;color:#ffcb6b;">rel</span><span style="color:#89ddff;">=&quot;</span><span style="color:#c3e88d;">stylesheet</span><span style="color:#89ddff;">&quot; </span><span style="font-style:italic;color:#ffcb6b;">type</span><span style="color:#89ddff;">=&quot;</span><span style="color:#c3e88d;">text/css</span><span style="color:#89ddff;">&quot; </span><span style="font-style:italic;color:#ffcb6b;">href</span><span style="color:#89ddff;">=&quot;</span><span style="color:#c3e88d;">style.css</span><span style="color:#89ddff;">&quot;&gt;
+</span><span>	</span><span style="color:#89ddff;">&lt;/</span><span style="color:#f07178;">head</span><span style="color:#89ddff;">&gt;
+</span><span>	</span><span style="color:#89ddff;">&lt;</span><span style="color:#f07178;">body</span><span style="color:#89ddff;">&gt;
+</span><span>		</span><span style="color:#89ddff;">&lt;</span><span style="color:#f07178;">script </span><span style="font-style:italic;color:#ffcb6b;">src</span><span style="color:#89ddff;">=&quot;</span><span style="color:#c3e88d;">bundle.js</span><span style="color:#89ddff;">&quot;&gt;&lt;/</span><span style="color:#f07178;">script</span><span style="color:#89ddff;">&gt;
+</span><span>	</span><span style="color:#89ddff;">&lt;/</span><span style="color:#f07178;">body</span><span style="color:#89ddff;">&gt;
+</span><span style="color:#89ddff;">&lt;/</span><span style="color:#f07178;">html</span><span style="color:#89ddff;">&gt;
+</span></code></pre>
+<p>Open the HTML file in any browser and.. we should have a hello world on our screen! Woo, congratulations!</p>
+<p>An important thing to note is that your script tag should be inside of the body tag, otherwise it won't load!</p>
+<p>Tip: To get the traditional save-in-editor, alt-tab to browser, F5 ritual, you can run <code>rollup -c -w</code> on the command line to watch for file changes automatically.</p>
+
+			</div>
+
+			<div class="page-footer">
+				<p><b>Like my work?</b></p>
+				<p>You can <a href="https://meow.social/@codecat" rel="me noopener" target="blank">follow me on Mastodon</a> or <a href="https://www.patreon.com/openplanet" rel="noopener" target="blank">sponsor me on Patreon</a>.</p>
+			</div>
+		</div>
+	</article>
+
+		</div>
+
+		<footer>
+			&copy; Melissa Geels 2024
+		</footer>
+	</body>
+</html>

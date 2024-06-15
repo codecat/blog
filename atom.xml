@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
+    <title></title>
+    <link href="https://codecat.nl/atom.xml" rel="self" type="application/atom+xml"/>
+    <link href="https://codecat.nl"/>
+    <generator uri="https://www.getzola.org/">Zola</generator>
+    <updated>2024-06-15T00:00:00+00:00</updated>
+    <id>https://codecat.nl/atom.xml</id>
+    <entry xml:lang="en">
+        <title>Rooting the HiBy R3ii</title>
+        <published>2024-06-15T00:00:00+00:00</published>
+        <updated>2024-06-15T00:00:00+00:00</updated>
+        <author>
+          <name>Unknown</name>
+        </author>
+        <link rel="alternate" href="https://codecat.nl/2024/06/hiby-r3ii-root/" type="text/html"/>
+        <id>https://codecat.nl/2024/06/hiby-r3ii-root/</id>
+        
+        <summary type="html">&lt;p&gt;The HiBy R3ii is a &amp;quot;Digital Audio Player&amp;quot; (DAP), basically the modern equivalent of MP3 players from the 00&#x27;s. Naturally, I wanted to find out how hackable the device is.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;img src=&quot;&#x2F;2024&#x2F;06&#x2F;hiby-main.jpg&quot; alt=&quot;&quot; &#x2F;&gt;&lt;&#x2F;p&gt;
+</summary>
+        
+    </entry>
+    <entry xml:lang="en">
+        <title>Building an open source IRL livestreaming backpack</title>
+        <published>2022-08-18T00:00:00+00:00</published>
+        <updated>2022-08-18T00:00:00+00:00</updated>
+        <author>
+          <name>Unknown</name>
+        </author>
+        <link rel="alternate" href="https://codecat.nl/2022/08/irl-backpack/" type="text/html"/>
+        <id>https://codecat.nl/2022/08/irl-backpack/</id>
+        
+        <summary type="html">&lt;p&gt;This month I decided to build an IRL livestreaming backpack. Not with the desire to become an IRL streamer, but because I think it&#x27;s a very fun technical challenge. I gathered and set up all the hardware, reverse engineered some firmware images, and coded my own software to control it.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;img src=&quot;&#x2F;2022&#x2F;08&#x2F;backpack.jpg&quot; alt=&quot;&quot; &#x2F;&gt;&lt;&#x2F;p&gt;
+</summary>
+        
+    </entry>
+    <entry xml:lang="en">
+        <title>Creating a web-app with Svelte and Rollup as a game developer</title>
+        <published>2019-08-18T00:00:00+00:00</published>
+        <updated>2019-08-18T00:00:00+00:00</updated>
+        <author>
+          <name>Unknown</name>
+        </author>
+        <link rel="alternate" href="https://codecat.nl/2019/08/creating-a-web-app-with-svelte-and-rollup-as-a-game-developer/" type="text/html"/>
+        <id>https://codecat.nl/2019/08/creating-a-web-app-with-svelte-and-rollup-as-a-game-developer/</id>
+        
+        <summary type="html">&lt;p&gt;I&#x27;m not a web developer. I&#x27;m a game developer who primarily uses C++. But I needed to set up a nice easy-to-work-with web-app for a project, so I was forced to kinda learn how to do that.&lt;&#x2F;p&gt;
+&lt;p&gt;As I&#x27;m not well-versed in the world of modern web technologies, I figured I&#x27;d write a blog post of my experience of setting up a simple Svelte site, for people who might be in the same boat as me.&lt;&#x2F;p&gt;
+</summary>
+        
+    </entry>
+    <entry xml:lang="en">
+        <title>Reverse engineering and &#x27;exploiting&#x27; a game trainer</title>
+        <published>2018-05-20T00:00:00+00:00</published>
+        <updated>2018-05-20T00:00:00+00:00</updated>
+        <author>
+          <name>Unknown</name>
+        </author>
+        <link rel="alternate" href="https://codecat.nl/2018/05/reverse-engineering-and-exploiting-a-game-trainer/" type="text/html"/>
+        <id>https://codecat.nl/2018/05/reverse-engineering-and-exploiting-a-game-trainer/</id>
+        
+        <summary type="html">&lt;p&gt;In the weeks after &lt;a href=&quot;https:&#x2F;&#x2F;store.steampowered.com&#x2F;app&#x2F;677120&#x2F;Heroes_of_Hammerwatch&#x2F;&quot;&gt;Heroes of Hammerwatch&lt;&#x2F;a&gt; came out, people kept asking for cheats for the game. You would expect in any other single player game there would be one or two cheats available that players can use, but in Heroes of Hammerwatch we&#x27;ve decided to keep the cheats locked up only for developers. There&#x27;s a few reasons for that, but the main reason is that the player&#x27;s stats are persistent; players can bring their own character into multiplayer sessions.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;img src=&quot;&#x2F;2018&#x2F;05&#x2F;hwr.jpg&quot; alt=&quot;&quot; &#x2F;&gt;&lt;&#x2F;p&gt;
+</summary>
+        
+    </entry>
+    <entry xml:lang="en">
+        <title>Implementing a stylesheet system is hard</title>
+        <published>2017-08-02T00:00:00+00:00</published>
+        <updated>2017-08-02T00:00:00+00:00</updated>
+        <author>
+          <name>Unknown</name>
+        </author>
+        <link rel="alternate" href="https://codecat.nl/2017/08/nimble-app-progress/" type="text/html"/>
+        <id>https://codecat.nl/2017/08/nimble-app-progress/</id>
+        
+        <summary type="html">&lt;p&gt;It has been exactly 1 month since &lt;a href=&quot;&#x2F;hardware-accelerated-application-framework&quot;&gt;my last blogpost on Nimble Application Framework&lt;&#x2F;a&gt;. In the past month I&#x27;ve been working on and off, particularly on stylesheet experimentation; which I have decided to cut for the time being.&lt;&#x2F;p&gt;
+&lt;p&gt;There&#x27;s also a new localization system for translating strings into different languages, and a new &amp;quot;page&amp;quot; system.&lt;&#x2F;p&gt;
+</summary>
+        
+    </entry>
+    <entry xml:lang="en">
+        <title>Hardware accelerated application framework in C++</title>
+        <published>2017-07-02T00:00:00+00:00</published>
+        <updated>2017-07-02T00:00:00+00:00</updated>
+        <author>
+          <name>Unknown</name>
+        </author>
+        <link rel="alternate" href="https://codecat.nl/2017/07/hardware-accelerated-application-framework/" type="text/html"/>
+        <id>https://codecat.nl/2017/07/hardware-accelerated-application-framework/</id>
+        
+        <summary type="html">&lt;p&gt;I have decided to start working on a new hardware accelerated (cross-platform) application framework in C++, called Nimble Application Framework.&lt;&#x2F;p&gt;
+</summary>
+        
+    </entry>
+    <entry xml:lang="en">
+        <title>What I learned from The Serious Ranker</title>
+        <published>2015-10-25T00:00:00+00:00</published>
+        <updated>2015-10-25T00:00:00+00:00</updated>
+        <author>
+          <name>Unknown</name>
+        </author>
+        <link rel="alternate" href="https://codecat.nl/2015/10/what-i-learned-from-the-serious-ranker/" type="text/html"/>
+        <id>https://codecat.nl/2015/10/what-i-learned-from-the-serious-ranker/</id>
+        
+        <summary type="html">&lt;p&gt;This is a post I&#x27;ve wanted to do for a while. It&#x27;s about a leaderboard design and its progression towards its end-of-life. I&#x27;m posting this in the hope that it will be useful to people, you could learn something from this!&lt;&#x2F;p&gt;
+</summary>
+        
+    </entry>
+    <entry xml:lang="en">
+        <title>So.. I have this blog now.</title>
+        <published>2015-10-24T00:00:00+00:00</published>
+        <updated>2015-10-24T00:00:00+00:00</updated>
+        <author>
+          <name>Unknown</name>
+        </author>
+        <link rel="alternate" href="https://codecat.nl/2015/10/so-i-have-this-blog-now/" type="text/html"/>
+        <id>https://codecat.nl/2015/10/so-i-have-this-blog-now/</id>
+        
+        <summary type="html">&lt;p&gt;Hooray!&lt;&#x2F;p&gt;
+</summary>
+        
+    </entry>
+</feed>

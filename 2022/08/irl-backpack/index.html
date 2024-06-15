@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en-US">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width">
+
+		
+			<title>Building an open source IRL livestreaming backpack - Codecat - Scribblings of a programatrickerist.</title>
+		
+
+		<meta name="theme-color" content="#a7eb47">
+		<meta property="og:title" content="Building an open source IRL livestreaming backpack">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://codecat.nl/2022/08/irl-backpack/">
+		
+			<meta property="og:image" content="https://codecat.nl/2022/08/backpack.jpg">
+		
+		
+			<meta property="og:description" content="This month I decided to build an IRL livestreaming backpack. Not with the desire to become an IRL streamer, but because I think it&#x27;s a very fun technical challenge. I gathered and set up all the hardware, reverse engineered some firmware images, and coded my own software to control it.">
+		
+
+		<link rel="stylesheet" href="/pure.css">
+		<link rel="stylesheet" href="/style.css">
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css" integrity="sha256-XoaMnoYC5TH6/+ihMEnospgm0J1PM/nioxbOUdnM8HY=" crossorigin="anonymous">
+	</head>
+
+	<body>
+		<header>
+			<h1><a href="/">Codecat.nl</a></h1>
+			<p class="social">
+				<a rel="me noopener noreferrer" href="https://meow.social/@codecat" title="Mastodon" target="_blank"><i class="fa fa-mastodon" aria-hidden="true"></i></a>
+				<a rel="me noopener noreferrer" href="https://github.com/codecat" title="GitHub" target="_blank"><i class="fa fa-github" aria-hidden="true"></i></a>
+				<a rel="me noopener noreferrer" href="https://nimble.itch.io" title="Itch" target="_blank"><i class="fa fa-gamepad" aria-hidden="true"></i></a>
+				<a rel="me noopener noreferrer" href="https://twitch.tv/missterious" title="Twitch" target="_blank"><i class="fa fa-twitch" aria-hidden="true"></i></a>
+				<a rel="me noopener noreferrer" href="https://soundcloud.com/codecatt" title="SoundCloud" target="_blank"><i class="fa fa-soundcloud" aria-hidden="true"></i></a>
+			</p>
+		</header>
+
+		<div class="container">
+			
+	<article class="pure-g">
+		<div class="pure-u-1">
+			<h1>Building an open source IRL livestreaming backpack</h1>
+			<p class="subtitle">
+				<i class="fa fa-calendar" aria-hidden="true"></i>
+				Posted on 2022-08-18
+			</p>
+			<div class="content">
+				<p>This month I decided to build an IRL livestreaming backpack. Not with the desire to become an IRL streamer, but because I think it's a very fun technical challenge. I gathered and set up all the hardware, reverse engineered some firmware images, and coded my own software to control it.</p>
+<p><img src="/2022/08/backpack.jpg" alt="" /></p>
+<span id="continue-reading"></span><h1 id="deciding-on-the-hardware">Deciding on the hardware</h1>
+<p>To get started, I made a list of hardware I definitely need:</p>
+<ol>
+<li>Camera</li>
+<li>Small ARM-based computer</li>
+<li>4G modem (and a good data bundle)</li>
+<li>Battery pack</li>
+<li>Phone to control stuff (I used my iPhone)</li>
+<li>Computer to stream to Twitch (I used my home PC)</li>
+</ol>
+<p>This would be the bare minimum to get stuff working.</p>
+<h2 id="the-camera">The camera</h2>
+<p>For the camera, I decided to go with a <a href="https://gopro.com/en/us/shop/cameras/hero10-black/CHDHX-101-master.html">GoPro HERO 10</a>, because it's a small portable action camera, and it actually has a USB interface which can make it act like a webcam. I ran into a number of peculiar quirks while setting this up, which I will go more in-depth about further down below.</p>
+<p>I also needed the <a href="https://gopro.com/en/us/shop/mounts-accessories/usb-pass-through-door/ADCOD-001.html">USB Pass-Through Door</a> to make sure I could keep the USB connected to the GoPro without exposing the battery at all times.</p>
+<p><img src="/2022/08/gopro.jpg" alt="" /></p>
+<h2 id="the-arm-computer">The ARM computer</h2>
+<p>Finding the right ARM computer to handle the actual streaming was a little bit of a gamble due to the actual hardware performance requirements. Despite that, I actually ended up using a <a href="https://www.raspberrypi.com/products/raspberry-pi-4-model-b/">Raspberry Pi 4 Model B</a>, even though it's not fast enough for encoding. (I'll explain this decision more later.)</p>
+<p>I also ordered a <a href="https://www.kiwi-electronics.com/en/aluminium-heatsink-case-voor-raspberry-pi-4-blauw-7398">big heatsink</a> for it because it was getting way too hot. The heatsink is very efficient at reducing CPU temperature.</p>
+<p><img src="/2022/08/pi.jpg" alt="" /></p>
+<h2 id="the-4g-modem">The 4G modem</h2>
+<p>I still plan to replace the one I am using now, but my dad still had an old 4G modem we got from our ISP, so I ended up using it for my testing. It's a Huawei E5372. It hosts a wifi hotspot, but it also supports a wired network interface when connected through USB.</p>
+<p><img src="/2022/08/modem.jpg" alt="" /></p>
+<h2 id="the-battery-pack">The battery pack</h2>
+<p>This one isn't very complicated, you can use any big battery pack with a USB output. It just needs to have enough amperage to power the Raspberry Pi.</p>
+<h1 id="setting-up-the-raspberry-pi">Setting up the Raspberry Pi</h1>
+<p>Before jumping into the software and the actual streaming, I should mention how I have my network set up.</p>
+<p>I am using <a href="https://www.wireguard.com/">Wireguard</a> to create a VPN between the backpack, my home computer, my phone, and my server. This means I can connect every node in the network to all other nodes, allowing me to stream from the Raspberry Pi anywhere in the world directly to my server, and then pulling that stream into OBS on my home computer.</p>
+<p>For example:</p>
+<ul>
+<li><code>10.0.0.1</code> Server</li>
+<li><code>10.0.0.2</code> Raspberry Pi</li>
+<li><code>10.0.0.3</code> Home PC with OBS</li>
+<li><code>10.0.0.4</code> Phone</li>
+</ul>
+<p>This also required making sure the Raspberry Pi had a proper date and time set, because Wireguard refuses to work otherwise. I had to make sure NTP was working properly by installing <code>systemd-timesyncd</code>, running <code>sudo timedatectl set-ntp true</code>, and modifying <code>/etc/systemd/timesyncd.conf</code> to add NTP server pools located in the Netherlands.</p>
+<h1 id="connecting-the-modem">Connecting the modem</h1>
+<p>Connecting the modem via USB creates a network interface (prefixed with <code>wwx</code>). Enabling DHCP in the Pi's Netplan configuration gives us an IP address, which lets us route all traffic through 4G.</p>
+<p>The Netplan configuration is simple, and just requires adding an ethernet config to <code>/etc/netplan/10-network.yaml</code>, followed by <code>netplan generate &amp;&amp; netplan apply</code>:</p>
+<pre data-lang="yaml" style="background-color:#212121;color:#eeffff;" class="language-yaml "><code class="language-yaml" data-lang="yaml"><span style="color:#f07178;">network</span><span style="color:#89ddff;">:
+</span><span>  </span><span style="color:#f07178;">version</span><span style="color:#89ddff;">: </span><span style="color:#f78c6c;">2
+</span><span>  </span><span style="color:#f07178;">renderer</span><span style="color:#89ddff;">: </span><span style="color:#c3e88d;">networkd
+</span><span>  </span><span style="color:#f07178;">ethernets</span><span style="color:#89ddff;">:
+</span><span>    </span><span style="color:#f07178;">wwx000000000000</span><span style="color:#89ddff;">: </span><span style="font-style:italic;color:#4a4a4a;"># Put your actual interface name here
+</span><span>      </span><span style="color:#f07178;">dhcp4</span><span style="color:#89ddff;">: </span><span style="color:#f78c6c;">yes
+</span></code></pre>
+<p>I spent some time trying to reverse engineer <a href="/2022/08/E5372.bin">the firmware image</a> of this modem, but as I had most of the things I needed from it, I haven't spent that much time in this area. There's a <a href="https://archive.ph/RPF4w">small documentation on the E5186</a> that I found while researching this modem, which seems somewhat compatible with the E5372 I have.</p>
+<p>The API supports sending and receiving SMS messages, which will come in useful when dealing with the 10 GB per day limit on the Netherlands' &quot;unlimited data&quot; packages that are available. Their &quot;fair use policy&quot; limits data to 10 GB per day but allows incrementing that with 2 GB via SMS an unlimited number of times. Currently I haven't played around with this yet, but it's something I'm still planning to try.</p>
+<h1 id="connecting-the-gopro">Connecting the GoPro</h1>
+<p>The GoPro is connected via USB to the Raspberry Pi. Surprisingly, similarly to the modem, the USB interface of the GoPro camera provides a network interface (prefixed with <code>enx</code>) which allows communicating with it. Once you enable DHCP on the camera interface in Netplan, you can access its HTTP server, which is <a href="https://github.com/KonradIT/goprowifihack">unofficially documented here</a>.</p>
+<p>To get the IP address of the GoPro, we take the IP address we were given by DHCP and replace the last part to <code>51</code>. Then, to enable <a href="https://github.com/KonradIT/goprowifihack/blob/master/HERO9/GoPro-Connect.md">webcam mode</a>, we can send a simple request:</p>
+<pre data-lang="bash" style="background-color:#212121;color:#eeffff;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#82aaff;">$ curl http://172.24.129.51/gp/gpWebcam/START</span><span style="color:#89ddff;">\?</span><span style="color:#82aaff;">res=1080
+</span></code></pre>
+<p>Once webcam mode is turned on, it will make the GoPro broadcast a continuous RTSP stream on its network interface. We can then re-broadcast this stream to the server directly through ffmpeg:</p>
+<pre data-lang="bash" style="background-color:#212121;color:#eeffff;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#82aaff;">$ ffmpeg </span><span style="color:#89ddff;">\
+</span><span style="color:#89ddff;">	-</span><span style="color:#f78c6c;">i</span><span style="color:#82aaff;"> udp://@0.0.0.0:8554</span><span style="color:#89ddff;">\?</span><span style="color:#82aaff;">overrun_nonfatal=1</span><span style="color:#89ddff;">\&amp;</span><span style="color:#82aaff;">fifo_size=50000000 </span><span style="color:#89ddff;">\
+</span><span style="color:#89ddff;">	-</span><span style="color:#f78c6c;">c</span><span style="color:#82aaff;">:v copy </span><span style="color:#89ddff;">\
+</span><span style="color:#89ddff;">	-</span><span style="color:#f78c6c;">c</span><span style="color:#82aaff;">:a aac</span><span style="color:#89ddff;"> -</span><span style="color:#f78c6c;">ar</span><span style="color:#82aaff;"> 44100 </span><span style="color:#89ddff;">\
+</span><span style="color:#89ddff;">	-</span><span style="color:#f78c6c;">f</span><span style="color:#82aaff;"> rtsp rtsp://10.0.0.1:8554/stream
+</span></code></pre>
+<p>If you know ffmpeg at all, you'll immediately see that we are not actually encoding the video, we are just copying it (through <code>-c:v copy</code>). The GoPro encodes its own mpeg stream, so we don't necessarily have to encode it ourselves, and we don't need to use much of the Raspberry Pi CPU resources either, and can easily stream 1080p.</p>
+<p>I am however re-encoding the audio (through <code>-c:a aac -ar 44100</code>) to get the smallest possible audio stream that still sounds good instead of the default, which saves a (tiny) little bit on bandwidth.</p>
+<p>This is then being broadcast via RTSP to the server, which is running <a href="https://github.com/aler9/rtsp-simple-server">RtspSimpleServer</a>.</p>
+<p>I ended up reverse engineering <a href="https://gopro.com/en/us/support/hero10-black-product-update">the GoPro firmware</a> (which helpfully has most of its debug symbols available!), to find out you can also use the API to configure the bitrate that the GoPro encodes at (and subsequently <a href="https://github.com/KonradIT/goprowifihack/pull/279">documented this in the unofficial documentation</a>). This is useful when testing on a bandwidth limited data bundle.</p>
+<pre data-lang="bash" style="background-color:#212121;color:#eeffff;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#82aaff;">$ curl http://172.24.129.51/gp/gpWebcam/SETTINGS</span><span style="color:#89ddff;">\?</span><span style="color:#82aaff;">bitrate=2000000
+</span></code></pre>
+<p>Unfortunately I have not yet found a way to enable camera stabilization. Perhaps this is possible through the separate <a href="https://github.com/KonradIT/goprowifihack/blob/master/HERO9/Livestreaming.md">&quot;streaming&quot;</a> feature available through the API, but I have not tried that yet.</p>
+<p>Alternatively if we do need to re-encode video at some point, we would have to get a more powerful ARM computer, such as the popular <a href="https://www.nvidia.com/en-us/autonomous-machines/embedded-systems/jetson-nano/">Jetson Nano</a>. The Raspberry Pi can also encode, but in practice this is limited to a framerate of 15 FPS at 720p, and you might need a more complex cooling solution.</p>
+<h1 id="writing-the-software">Writing the software</h1>
+<p>I had to write 2 different pieces of software:</p>
+<ol>
+<li>The encoder server for the Raspberry Pi <a href="https://github.com/codecat/irl-server">(source code)</a></li>
+<li>An app for the iPhone to control the encoder server and OBS at home <a href="https://github.com/codecat/irl-phone">(source code)</a></li>
+</ol>
+<h2 id="the-encoder-server">The encoder server</h2>
+<p>This is the server code running on the Raspberry Pi. It maintains a connection between the GoPro, the server, and OBS. It runs <code>ffmpeg</code> to stream the GoPro footage, talks with OBS using <code>obs-websocket</code>, and provides an API for the iPhone app to talk with.</p>
+<p>It's written in Go, and you can find <a href="https://github.com/codecat/irl-server">the source code on Github</a>.</p>
+<p>The code is cross-compiled for ARM64 on any other platform (I've used both Windows and Mac for this), and then deployed through SSH to the Raspberry Pi itself. Technically this process would even be possible remotely, when the backpack is in active use and connected to 4G.</p>
+<h2 id="the-iphone-app">The iPhone app</h2>
+<p>I wanted to control the encoder server directly from my phone. This would let me mount my phone to my bike and still have everything that's happening on the Raspberry Pi visible. Some requirements that I wanted this app to have:</p>
+<ul>
+<li>See that each component in the backpack is still running</li>
+<li>See the current temperature of the Raspberry Pi CPU (it can get very hot)</li>
+<li>See the used network bandwidth in megabytes (I still only have a limited data package)</li>
+<li>Turn the GoPro on/off</li>
+<li>Turn the OBS stream on/off</li>
+</ul>
+<p>The app is made with <a href="https://capacitorjs.com/">Capacitor</a> and <a href="https://v2.vuejs.org/">Vue2</a>, and talks directly with the encoder server through the VPN. It's worth noting that the phone and the 4G modem are on separate networks, and are only connected through the VPN.</p>
+<p>You can find <a href="https://github.com/codecat/irl-phone">its source code on Github</a> as well.</p>
+<p>To make sure I know what's happening at all times, I made sure that the app refreshes its data every 2 seconds, and clearly shows that it is refreshing, and shows an error if even the tiniest of things goes wrong. This way I know that everything still works.</p>
+<p>All the data on the app goes directly through the encoder server's API requests. This includes the websocket to OBS, to start and stop the Twitch stream, change scenes, and get the current livestream's duration.</p>
+<p>I was considering building a Twitch chat view as well, but there are other more established apps for that (<a href="https://chatsen.app/">Chatsen</a> is the one I was using in my tests).</p>
+<p>The following is a screenshot of a quick stream I did on Twitch to test the whole setup. It was streamed at a low bitrate at 480p because I didn't want to burn through all of my data in 1 go.</p>
+<div style="text-align: center;"><img src="/2022/08/app.jpg"></div>
+<h1 id="mounting-the-gopro">Mounting the GoPro</h1>
+<p>This was probably the hardest to get right (it's still not entirely great), because I wanted to mount it somewhere on my backpack that wasn't on my shoulder. Initially I wanted to use a tripod that I could fit in the handy shoulder pouch, but the tripod I had wasn't too sturdy and would move around a lot.</p>
+<p>What I ended up playing around with is a number of different 3D printed mounts that my dad helped me design and 3D print. The final one we ended up at is a modified version of <a href="https://www.tinkercad.com/things/fCrZAKIglwB">this backpack mount</a>. We went through several iterations before we got it right. You can find <a href="https://www.tinkercad.com/things/hGIXJK3t71o?sharecode=OLjnFSX-Lh8uvYeqY7Pg_AaIvkxSZ2liyfZS6p-r39E">all of the iterations on Tinkercad</a>.</p>
+<p>These fit on the long front straps of the backpack and can fit the mount point of the GoPro directly.</p>
+<p><img src="/2022/08/mounts.jpg" alt="" /></p>
+<h1 id="fitting-it-all">Fitting it all</h1>
+<p>The last step was to fit it all inside of the backpack. I bought some specialized angled cables to connect the Raspberry Pi with the modem and the battery pack in a nice compact way. The camera is connected to the (longer) cable I got with the USB passthrough door, but any (non-angled) USB-C cable will work for this purpose as well.</p>
+<p>I highly recommend Wenger backpacks, they have a very solid build quality and have a ton of little places to hide stuff in. I recently bought the <a href="https://www.wenger.ch/global/en/Products/Business-Gear/Business-Backpacks/Pegasus-Deluxe/p/606492">Wenger Pegasus Deluxe</a> after owning the non-deluxe version for over a decade. (Which is still in perfect shape!)</p>
+<p><img src="/2022/08/fit.jpg" alt="" /></p>
+<h1 id="conclusion">Conclusion</h1>
+<p>This was a fun DIY build! This is definitely very obviously a first iteration. I might improve on it in the future. Some points of improvement that I would like to see in the next version:</p>
+<ul>
+<li>Better cooling - perhaps a fan that blows hot air out of the backpack.</li>
+<li>A more fleshed-out phone app - currently it's a very quickly developed app purely to show what's going on and to quickly control stuff. This could have a lot more functionality. Perhaps even a built-in Twitch chat.</li>
+<li>Better camera mount - perhaps something that lets me rotate it in 2 axes instead of only 1 axis. Maybe some kind of quick-release too, to remove the camera from the mount very quickly.</li>
+<li>Better (more reliable) modem - I'm currently using an older modem which I do not really know the reliability of.</li>
+<li>Automated support of fair use policy &quot;unlimited&quot; data bundles.</li>
+<li>External microphone - the GoPro built-in microphone is decent, but I think an external audio interface could provide a lot better quality.</li>
+<li>See the battery pack percentage on the phone app.</li>
+</ul>
+<p>Thanks for reading! :)</p>
+
+			</div>
+
+			<div class="page-footer">
+				<p><b>Like my work?</b></p>
+				<p>You can <a href="https://meow.social/@codecat" rel="me noopener" target="blank">follow me on Mastodon</a> or <a href="https://www.patreon.com/openplanet" rel="noopener" target="blank">sponsor me on Patreon</a>.</p>
+			</div>
+		</div>
+	</article>
+
+		</div>
+
+		<footer>
+			&copy; Melissa Geels 2024
+		</footer>
+	</body>
+</html>

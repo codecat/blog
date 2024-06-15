@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en-US">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width">
+
+		
+			<title>Hardware accelerated application framework in C++ - Codecat - Scribblings of a programatrickerist.</title>
+		
+
+		<meta name="theme-color" content="#a7eb47">
+		<meta property="og:title" content="Hardware accelerated application framework in C++">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://codecat.nl/2017/07/hardware-accelerated-application-framework/">
+		
+		
+			<meta property="og:description" content="I have decided to start working on a new hardware accelerated (cross-platform) application framework in C++, called Nimble Application Framework.">
+		
+
+		<link rel="stylesheet" href="/pure.css">
+		<link rel="stylesheet" href="/style.css">
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css" integrity="sha256-XoaMnoYC5TH6/+ihMEnospgm0J1PM/nioxbOUdnM8HY=" crossorigin="anonymous">
+	</head>
+
+	<body>
+		<header>
+			<h1><a href="/">Codecat.nl</a></h1>
+			<p class="social">
+				<a rel="me noopener noreferrer" href="https://meow.social/@codecat" title="Mastodon" target="_blank"><i class="fa fa-mastodon" aria-hidden="true"></i></a>
+				<a rel="me noopener noreferrer" href="https://github.com/codecat" title="GitHub" target="_blank"><i class="fa fa-github" aria-hidden="true"></i></a>
+				<a rel="me noopener noreferrer" href="https://nimble.itch.io" title="Itch" target="_blank"><i class="fa fa-gamepad" aria-hidden="true"></i></a>
+				<a rel="me noopener noreferrer" href="https://twitch.tv/missterious" title="Twitch" target="_blank"><i class="fa fa-twitch" aria-hidden="true"></i></a>
+				<a rel="me noopener noreferrer" href="https://soundcloud.com/codecatt" title="SoundCloud" target="_blank"><i class="fa fa-soundcloud" aria-hidden="true"></i></a>
+			</p>
+		</header>
+
+		<div class="container">
+			
+	<article class="pure-g">
+		<div class="pure-u-1">
+			<h1>Hardware accelerated application framework in C++</h1>
+			<p class="subtitle">
+				<i class="fa fa-calendar" aria-hidden="true"></i>
+				Posted on 2017-07-02
+			</p>
+			<div class="content">
+				<p>I have decided to start working on a new hardware accelerated (cross-platform) application framework in C++, called Nimble Application Framework.</p>
+<span id="continue-reading"></span>
+<p>Nimble Writer has been the first product released under my company Nimble Tools. Unfortunately, it is not cross-platform, and it heavily relies on software painting with GDI. That means it will only work on Windows, and too many visual effects will cause it to flicker and/or be slow.</p>
+<p>There has been an attempt to completely rewrite Nimble Writer from scratch using the (now seemingly discontinued) <a href="https://github.com/fruxo/turbobadger">Turbobadger library</a>. This is a library that provides a hardware accelerated widget framework with a full layout and render invalidation system. The idea is good, but it has a few things that are worth noting:</p>
+<ul>
+<li>It uses its own special file format with its own special syntax for defining styles and layouts. I've written a Sublime Text syntax highlighter for it, because there is nothing else for it.</li>
+<li>The code sometimes has issues when it comes to high DPI displays.</li>
+<li>It's not very easy to set up a new application with this system, eg. a skeleton project requires a bit too much code and configuration.</li>
+<li>It uses pure bitmaps for its styling instead of scalable graphics. (There's a branch on Turbobadger that provides this, but last time I checked it wasn't ready for production use.)</li>
+</ul>
+<p>After using the library for a while, as well as submitting pull requests and maintaining a custom fork for my software purposes, I've decided to drop that library and finally start working on my own. Introducing: <a href="https://github.com/nimbletools/nimble-app/">Nimble Application Framework</a>.</p>
+<p>This is an open source project similar to Turbobadger, but built from the ground up. Since the idea is to have a very simple API, the following is currently enough to show a window containing widgets defined in an xml file:</p>
+<pre data-lang="cpp" style="background-color:#212121;color:#eeffff;" class="language-cpp "><code class="language-cpp" data-lang="cpp"><span style="font-style:italic;color:#c792ea;">#include </span><span style="color:#89ddff;">&lt;</span><span style="color:#c3e88d;">nimble/app.h</span><span style="color:#89ddff;">&gt;
+</span><span>
+</span><span style="font-style:italic;color:#c792ea;">class </span><span style="color:#ffcb6b;">ExampleApplication </span><span style="color:#89ddff;">: </span><span style="color:#c792ea;">public </span><span style="color:#c3e88d;">na</span><span style="color:#89ddff;">::</span><span style="color:#c3e88d;">Application
+</span><span style="color:#89ddff;">{
+</span><span style="color:#c792ea;">public</span><span style="color:#89ddff;">:
+</span><span>	</span><span style="color:#c792ea;">virtual </span><span style="font-style:italic;color:#c792ea;">void </span><span style="color:#82aaff;">OnLoad</span><span style="color:#89ddff;">()
+</span><span>	</span><span style="color:#89ddff;">{
+</span><span>		</span><span style="color:#82aaff;">LoadLayout</span><span style="color:#89ddff;">(&quot;</span><span style="color:#c3e88d;">content/example.xml</span><span style="color:#89ddff;">&quot;);
+</span><span>	</span><span style="color:#89ddff;">}
+</span><span style="color:#89ddff;">};
+</span><span>
+</span><span style="font-style:italic;color:#c792ea;">int </span><span style="color:#82aaff;">main</span><span style="color:#89ddff;">()
+</span><span style="color:#89ddff;">{
+</span><span>	ExampleApplication</span><span style="color:#89ddff;">*</span><span> app </span><span style="color:#89ddff;">= </span><span style="font-style:italic;color:#c792ea;">new </span><span style="color:#82aaff;">ExampleApplication</span><span style="color:#89ddff;">();
+</span><span>	app</span><span style="color:#89ddff;">-&gt;</span><span style="color:#82aaff;">Run</span><span style="color:#89ddff;">();
+</span><span>	</span><span style="font-style:italic;color:#c792ea;">delete</span><span> app</span><span style="color:#89ddff;">;
+</span><span>
+</span><span>	</span><span style="font-style:italic;color:#c792ea;">return </span><span style="color:#f78c6c;">0</span><span style="color:#89ddff;">;
+</span><span style="color:#89ddff;">}
+</span></code></pre>
+<p>As you can see, an application is basically a class inherited from <code>na::Application</code>. From there, you can load a layout XML file by calling <code>LoadLayout</code> with a filename. In this case, <code>example.xml</code> looks like this:</p>
+<pre data-lang="xml" style="background-color:#212121;color:#eeffff;" class="language-xml "><code class="language-xml" data-lang="xml"><span style="color:#89ddff;">&lt;</span><span style="color:#f07178;">hbox </span><span style="color:#c792ea;">anchor</span><span style="color:#89ddff;">=&quot;</span><span style="color:#c3e88d;">fill</span><span style="color:#89ddff;">&quot; </span><span style="color:#c792ea;">color</span><span style="color:#89ddff;">=&quot;</span><span style="color:#c3e88d;">#330000ff</span><span style="color:#89ddff;">&quot;&gt;
+</span><span>	</span><span style="color:#89ddff;">&lt;</span><span style="color:#f07178;">vbox </span><span style="color:#c792ea;">anchor</span><span style="color:#89ddff;">=&quot;</span><span style="color:#c3e88d;">left fillv</span><span style="color:#89ddff;">&quot; </span><span style="color:#c792ea;">width</span><span style="color:#89ddff;">=&quot;</span><span style="color:#c3e88d;">300</span><span style="color:#89ddff;">&quot; </span><span style="color:#c792ea;">color</span><span style="color:#89ddff;">=&quot;</span><span style="color:#c3e88d;">#003300ff</span><span style="color:#89ddff;">&quot; </span><span style="color:#c792ea;">margin</span><span style="color:#89ddff;">=&quot;</span><span style="color:#c3e88d;">5</span><span style="color:#89ddff;">&quot;&gt;
+</span><span>		</span><span style="color:#89ddff;">&lt;</span><span style="color:#f07178;">label </span><span style="color:#c792ea;">fontsize</span><span style="color:#89ddff;">=&quot;</span><span style="color:#c3e88d;">24</span><span style="color:#89ddff;">&quot; </span><span style="color:#c792ea;">margin</span><span style="color:#89ddff;">=&quot;</span><span style="color:#c3e88d;">5</span><span style="color:#89ddff;">&quot; </span><span style="color:#c792ea;">font</span><span style="color:#89ddff;">=&quot;</span><span style="color:#c3e88d;">content/Roboto.ttf</span><span style="color:#89ddff;">&quot;&gt;
+</span><span>			Nimble App Example
+</span><span>		</span><span style="color:#89ddff;">&lt;/</span><span style="color:#f07178;">label</span><span style="color:#89ddff;">&gt;
+</span><span>
+</span><span>		</span><span style="color:#89ddff;">&lt;</span><span style="color:#f07178;">button </span><span style="color:#c792ea;">margin</span><span style="color:#89ddff;">=&quot;</span><span style="color:#c3e88d;">5</span><span style="color:#89ddff;">&quot; </span><span style="color:#c792ea;">font</span><span style="color:#89ddff;">=&quot;</span><span style="color:#c3e88d;">content/Roboto.ttf</span><span style="color:#89ddff;">&quot;&gt;</span><span>Create block</span><span style="color:#89ddff;">&lt;/</span><span style="color:#f07178;">button</span><span style="color:#89ddff;">&gt;
+</span><span>		</span><span style="color:#89ddff;">&lt;</span><span style="color:#f07178;">button </span><span style="color:#c792ea;">margin</span><span style="color:#89ddff;">=&quot;</span><span style="color:#c3e88d;">5</span><span style="color:#89ddff;">&quot; </span><span style="color:#c792ea;">font</span><span style="color:#89ddff;">=&quot;</span><span style="color:#c3e88d;">content/Roboto.ttf</span><span style="color:#89ddff;">&quot;&gt;</span><span>Invalidate layout</span><span style="color:#89ddff;">&lt;/</span><span style="color:#f07178;">button</span><span style="color:#89ddff;">&gt;
+</span><span>		</span><span style="color:#89ddff;">&lt;</span><span style="color:#f07178;">button </span><span style="color:#c792ea;">margin</span><span style="color:#89ddff;">=&quot;</span><span style="color:#c3e88d;">5</span><span style="color:#89ddff;">&quot; </span><span style="color:#c792ea;">font</span><span style="color:#89ddff;">=&quot;</span><span style="color:#c3e88d;">content/Roboto.ttf</span><span style="color:#89ddff;">&quot;&gt;</span><span>Resize window</span><span style="color:#89ddff;">&lt;/</span><span style="color:#f07178;">button</span><span style="color:#89ddff;">&gt;
+</span><span>	</span><span style="color:#89ddff;">&lt;/</span><span style="color:#f07178;">vbox</span><span style="color:#89ddff;">&gt;
+</span><span>
+</span><span>	</span><span style="color:#89ddff;">&lt;</span><span style="color:#f07178;">hbox </span><span style="color:#c792ea;">wrapping</span><span style="color:#89ddff;">=&quot;</span><span style="color:#c3e88d;">true</span><span style="color:#89ddff;">&quot; </span><span style="color:#c792ea;">anchor</span><span style="color:#89ddff;">=&quot;</span><span style="color:#c3e88d;">fill</span><span style="color:#89ddff;">&quot; </span><span style="color:#c792ea;">margin</span><span style="color:#89ddff;">=&quot;</span><span style="color:#c3e88d;">5</span><span style="color:#89ddff;">&quot; /&gt;
+</span><span style="color:#89ddff;">&lt;/</span><span style="color:#f07178;">hbox</span><span style="color:#89ddff;">&gt;
+</span></code></pre>
+<p>For now I'm passing some styles that should not be required (font, margin) repeatedly. I will add a stylesheet system for this later, more on this in a future blogpost. If you run this example application, you will see this:</p>
+<p><img src="/2017/07/nimble-app-framework.png" alt="" /></p>
+<p>It's good to note that the application is rendered properly on my MacBook's high-DPI Retina screen. This means it will automatically adjust for whatever DPI the system is using.</p>
+<p>Here are the key technologies and libraries I'm using to make all this happen:</p>
+<ul>
+<li><a href="https://github.com/glfw/glfw">GLFW</a> for the window creation, OpenGL context creation, and user input handling</li>
+<li><a href="https://github.com/memononen/nanovg">NanoVG</a> for primitive rendering, text rendering, and font loading</li>
+<li><a href="https://github.com/randrew/layout">Layout</a> for calculating widget rectangles</li>
+<li><a href="https://github.com/nigels-com/glew">GLEW</a> for OpenGL function bindings</li>
+<li><a href="https://github.com/g-truc/glm">GLM</a> for vector/matrix math</li>
+<li><a href="http://www.ambiera.com/irrxml/">IrrXML</a> for layout XML file parsing</li>
+<li><a href="https://github.com/codecat/scratch2">Scratch2</a> for the base classes (string, list, dict, …) to avoid having to rely on STL</li>
+</ul>
+<p>Over the course of the next couple weeks I hope to be able to show more progress on this project, as well as some screenshots of the first application that will be developed using this new library. The library is fully open source and you can follow its development on <a href="https://github.com/nimbletools/nimble-app/">Github</a>.</p>
+
+			</div>
+
+			<div class="page-footer">
+				<p><b>Like my work?</b></p>
+				<p>You can <a href="https://meow.social/@codecat" rel="me noopener" target="blank">follow me on Mastodon</a> or <a href="https://www.patreon.com/openplanet" rel="noopener" target="blank">sponsor me on Patreon</a>.</p>
+			</div>
+		</div>
+	</article>
+
+		</div>
+
+		<footer>
+			&copy; Melissa Geels 2024
+		</footer>
+	</body>
+</html>

